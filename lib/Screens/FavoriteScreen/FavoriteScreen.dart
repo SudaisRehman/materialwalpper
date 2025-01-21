@@ -1,6 +1,8 @@
 import 'package:ad_gridview/ad_gridview.dart';
+import 'package:admob_easy/ads/admob_easy.dart';
 import 'package:admob_easy/ads/services/admob_easy_native.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:materialwalpper/Provider/AppProvider.dart';
 import 'package:materialwalpper/Provider/FavoriteProvider.dart';
@@ -8,8 +10,85 @@ import 'package:materialwalpper/Screens/WallpaperScreen/WallpaperDetailsScreen.d
 // import 'package:materialwalpper/wallpaper_detail.dart';
 import 'package:provider/provider.dart'; // Import for Provider
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({Key? key}) : super(key: key);
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  InterstitialAd? _interstitialAd;
+  bool isInterstitialAdLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInterstitialAd();
+    // Fetch the wallpapers when the screen is initialized
+    AdmobEasy.instance.initialize(
+      androidNativeAdID: 'ca-app-pub-3940256099942544/2247696110',
+      // testDevices: ['543E082C0B43E6BF17AF6D4F72541F51']
+    );
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/1033173712',
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          setState(() {
+            _interstitialAd = ad;
+            isInterstitialAdLoaded = true;
+          });
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (InterstitialAd ad) {
+              ad.dispose();
+              _loadInterstitialAd(); // Load a new interstitial ad
+            },
+            onAdFailedToShowFullScreenContent: (Ad ad, AdError error) {
+              ad.dispose(); // Dispose if it fails to show
+              _loadInterstitialAd(); // Load a new interstitial ad
+            },
+          );
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          print('Failed to load interstitial ad: $error');
+          isInterstitialAdLoaded = false;
+          // Retry loading the ad after a delay or log the error
+        },
+      ),
+    );
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      // Ensure the ad is not null
+      _interstitialAd!.show();
+      setState(() {
+        _interstitialAd = null; // Dispose of the ad after showing
+        isInterstitialAdLoaded = false;
+      });
+      _loadInterstitialAd(); // Load a new interstitial ad
+    } else {
+      print('Tapp Interstitial ad not loaded yet.');
+    }
+  }
+
+  void _handleTap() {
+    // tapCount++;
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+    appProvider.incrementTapCount();
+    //  action();
+    if (appProvider.tapCount % 2 == 0) {
+      _showInterstitialAd();
+      // adManager?.showInterstitialAd();
+      print('Tapped ${appProvider.tapCount} even times');
+      print('Showing Interstitial Ad');
+    }
+    print('Tapped ${appProvider.tapCount} times');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +188,7 @@ class FavoritesScreen extends StatelessWidget {
                     }
                     print('favorites: $favorites');
                     print('indexnn: $index');
+                    _handleTap();
                     // Optional: Navigate to a detailed wallpaper view if needed
                     Navigator.push(
                         context,

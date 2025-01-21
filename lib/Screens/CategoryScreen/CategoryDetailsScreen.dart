@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:ad_gridview/ad_gridview.dart';
 import 'package:admob_easy/ads/services/admob_easy_native.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:materialwalpper/Provider/AppProvider.dart';
@@ -10,6 +11,8 @@ import 'package:materialwalpper/Screens/WallpaperScreen/WallpaperDetailsScreen.d
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
+const IAdIdManager adIdManager = TestAdIdManager();
 
 class CategoryDetailsScreen extends StatefulWidget {
   final String categoryId;
@@ -35,6 +38,11 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
     super.initState();
     _fetchCategoryDetails();
     _loadInterstitialAd();
+    EasyAds.instance.initialize(
+      adIdManager,
+      adMobAdRequest: const AdRequest(),
+      fbTestMode: true, // Optional, if you are using Facebook Ads in test mode
+    );
   }
 
   void _loadInterstitialAd() {
@@ -212,241 +220,258 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   Widget build(BuildContext context) {
     final appProvider = Provider.of<AppProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Category Details'),
-        backgroundColor: Colors.green,
-        actions: [
-          // three lines type icon
-          IconButton(
-            icon: Icon(Icons.sort),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  int _selectedSortOption = 0; // Default sort option (Recent)
+        appBar: AppBar(
+          title: Text('Category Details'),
+          backgroundColor: Colors.green,
+          actions: [
+            // three lines type icon
+            IconButton(
+              icon: Icon(Icons.sort),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    int _selectedSortOption = 0; // Default sort option (Recent)
 
-                  return StatefulBuilder(
-                    builder: (context, setState) {
-                      return AlertDialog(
-                        title: Text(
-                          'Sort Wallpapers',
-                          style: TextStyle(
-                            color: appProvider.isDarkTheme
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RadioListTile<int>(
-                              value: 0,
-                              activeColor: Colors.green,
-                              groupValue: _selectedSortOption,
-                              title: Text('Recent'),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSortOption = value!;
-                                });
-                              },
-                            ),
-                            RadioListTile<int>(
-                              value: 1,
-                              activeColor: Colors.green,
-                              groupValue: _selectedSortOption,
-                              title: Text('Featured'),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSortOption = value!;
-                                });
-                              },
-                            ),
-                            RadioListTile<int>(
-                              value: 2,
-                              groupValue: _selectedSortOption,
-                              activeColor: Colors.green,
-                              title: Text('Popular'),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSortOption = value!;
-                                });
-                              },
-                            ),
-                            RadioListTile<int>(
-                              value: 3,
-                              groupValue: _selectedSortOption,
-                              activeColor: Colors.green,
-                              title: Text('Random'),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSortOption = value!;
-                                });
-                              },
-                            ),
-                            // RadioListTile<int>(
-                            //   value: 4,
-                            //   groupValue: _selectedSortOption,
-                            //   activeColor: Colors.green,
-                            //   title: Text('Live Wallpaper'),
-                            //   onChanged: (value) {
-                            //     setState(() {
-                            //       _selectedSortOption = value!;
-                            //     });
-                            //   },
-                            // ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Cancel',
-                                style: TextStyle(color: Colors.blue)),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Handle the selected sort option here
-                              _fetchCategoryDetails(
-                                  sortOption: _selectedSortOption);
-                              print(
-                                  'Selected Sort Option: $_selectedSortOption');
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              'OK',
-                              style: TextStyle(color: Colors.blue),
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return AlertDialog(
+                          title: Text(
+                            'Sort Wallpapers',
+                            style: TextStyle(
+                              color: appProvider.isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          ),
-
-          //search icon
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // action
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SearchResultsScreen()));
-            },
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? GridView.builder(
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: appProvider.displayWallpaperColumns,
-                // crossAxisSpacing: 10,
-                // mainAxisSpacing: 10,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 8,
-                childAspectRatio: 0.65,
-              ),
-              itemCount: 22, // Number of shimmer items
-              itemBuilder: (context, index) {
-                return Shimmer.fromColors(
-                  baseColor: appProvider.isDarkTheme
-                      ? Colors.grey[800]!
-                      : Colors.grey[300]!,
-                  highlightColor: appProvider.isDarkTheme
-                      ? Colors.grey[700]!
-                      : Colors.grey[200]!,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              },
-            )
-          : _wallpapers.isEmpty
-              ? Center(child: Text('No wallpapers found'))
-              : AdGridView(
-                  padding: EdgeInsets.all(5),
-                  // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //   crossAxisCount: 3,
-                  //   crossAxisSpacing: 10,
-                  //   mainAxisSpacing: 10,
-                  // ),
-                  controller: ScrollController(),
-
-                  crossAxisCount: appProvider.displayWallpaperColumns,
-                  adGridViewType: AdGridViewType.custom,
-                  itemCount: _wallpapers.length, // Total number of wallpapers
-                  adIndex: 3,
-                  // itemMainAspectRatio: 1,
-                  itemMainAspectRatio: 1.5,
-                  customAdIndex: [3, 15, 30, 45, 60, 75, 90, 105],
-                  adWidget: Column(
-                    children: [
-                      AdmobEasyNative.mediumTemplate(
-                        minWidth: 320,
-                        minHeight: 320,
-                        maxWidth: 360,
-                        maxHeight: 360,
-                        onAdOpened: (ad) => print("Ad Opened"),
-                        onAdClosed: (ad) => print("Ad Closed"),
-                        onPaidEvent: (ad, value, precision, currencyCode) {
-                          print(
-                              "Paid event: $value $currencyCode with precision: $precision");
-                        },
-                      ),
-                      // SizedBox(height: 10),
-                    ],
-                  ),
-                  // itemCount: _wallpapers.length,
-                  itemWidget: (context, index) {
-                    final wallpaper = _wallpapers[index];
-                    final imageUrl = getImageUrl(wallpaper['image_upload']);
-
-                    return Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: GestureDetector(
-                          onTap: () {
-                            _handleTap();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        WallpaperDetailsScreen(
-                                          wallpapers: _wallpapers,
-                                          initialIndex: index,
-                                        )));
-                          },
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: appProvider.isDarkTheme
-                                  ? Colors.grey[800]!
-                                  : Colors.grey[300]!,
-                              highlightColor: appProvider.isDarkTheme
-                                  ? Colors.grey[700]!
-                                  : Colors.grey[200]!,
-                              child: Container(
-                                color: Colors.white,
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RadioListTile<int>(
+                                value: 0,
+                                activeColor: Colors.green,
+                                groupValue: _selectedSortOption,
+                                title: Text('Recent'),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedSortOption = value!;
+                                  });
+                                },
+                              ),
+                              RadioListTile<int>(
+                                value: 1,
+                                activeColor: Colors.green,
+                                groupValue: _selectedSortOption,
+                                title: Text('Featured'),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedSortOption = value!;
+                                  });
+                                },
+                              ),
+                              RadioListTile<int>(
+                                value: 2,
+                                groupValue: _selectedSortOption,
+                                activeColor: Colors.green,
+                                title: Text('Popular'),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedSortOption = value!;
+                                  });
+                                },
+                              ),
+                              RadioListTile<int>(
+                                value: 3,
+                                groupValue: _selectedSortOption,
+                                activeColor: Colors.green,
+                                title: Text('Random'),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedSortOption = value!;
+                                  });
+                                },
+                              ),
+                              // RadioListTile<int>(
+                              //   value: 4,
+                              //   groupValue: _selectedSortOption,
+                              //   activeColor: Colors.green,
+                              //   title: Text('Live Wallpaper'),
+                              //   onChanged: (value) {
+                              //     setState(() {
+                              //       _selectedSortOption = value!;
+                              //     });
+                              //   },
+                              // ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Cancel',
+                                  style: TextStyle(color: Colors.blue)),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Handle the selected sort option here
+                                _fetchCategoryDetails(
+                                    sortOption: _selectedSortOption);
+                                print(
+                                    'Selected Sort Option: $_selectedSortOption');
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'OK',
+                                style: TextStyle(color: Colors.blue),
                               ),
                             ),
-                            errorWidget: (context, url, error) =>
-                                Center(child: Icon(Icons.broken_image)),
-                          ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+
+            //search icon
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                // action
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SearchResultsScreen()));
+              },
+            ),
+          ],
+        ),
+        body: Stack(children: [
+          _isLoading
+              ? GridView.builder(
+                  padding: EdgeInsets.all(10),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: appProvider.displayWallpaperColumns,
+                    // crossAxisSpacing: 10,
+                    // mainAxisSpacing: 10,
+                    crossAxisSpacing: 6,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 0.65,
+                  ),
+                  itemCount: 22, // Number of shimmer items
+                  itemBuilder: (context, index) {
+                    return Shimmer.fromColors(
+                      baseColor: appProvider.isDarkTheme
+                          ? Colors.grey[800]!
+                          : Colors.grey[300]!,
+                      highlightColor: appProvider.isDarkTheme
+                          ? Colors.grey[700]!
+                          : Colors.grey[200]!,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     );
                   },
-                ),
-    );
+                )
+              : _wallpapers.isEmpty
+                  ? Center(child: Text('No wallpapers found'))
+                  : AdGridView(
+                      padding: EdgeInsets.all(5),
+                      // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      //   crossAxisCount: 3,
+                      //   crossAxisSpacing: 10,
+                      //   mainAxisSpacing: 10,
+                      // ),
+                      controller: ScrollController(),
+
+                      crossAxisCount: appProvider.displayWallpaperColumns,
+                      adGridViewType: AdGridViewType.custom,
+                      itemCount:
+                          _wallpapers.length, // Total number of wallpapers
+                      adIndex: 3,
+                      // itemMainAspectRatio: 1,
+                      itemMainAspectRatio: 1.5,
+                      customAdIndex: [3, 15, 30, 45, 60, 75, 90, 105],
+                      adWidget: Column(
+                        children: [
+                          AdmobEasyNative.mediumTemplate(
+                            minWidth: 320,
+                            minHeight: 320,
+                            maxWidth: 360,
+                            maxHeight: 360,
+                            onAdOpened: (ad) => print("Ad Opened"),
+                            onAdClosed: (ad) => print("Ad Closed"),
+                            onPaidEvent: (ad, value, precision, currencyCode) {
+                              print(
+                                  "Paid event: $value $currencyCode with precision: $precision");
+                            },
+                          ),
+                          // SizedBox(height: 10),
+                        ],
+                      ),
+                      // itemCount: _wallpapers.length,
+                      itemWidget: (context, index) {
+                        final wallpaper = _wallpapers[index];
+                        final imageUrl = getImageUrl(wallpaper['image_upload']);
+
+                        return Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: GestureDetector(
+                              onTap: () {
+                                _handleTap();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            WallpaperDetailsScreen(
+                                              wallpapers: _wallpapers,
+                                              initialIndex: index,
+                                            )));
+                              },
+                              child: CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
+                                  baseColor: appProvider.isDarkTheme
+                                      ? Colors.grey[800]!
+                                      : Colors.grey[300]!,
+                                  highlightColor: appProvider.isDarkTheme
+                                      ? Colors.grey[700]!
+                                      : Colors.grey[200]!,
+                                  child: Container(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Center(child: Icon(Icons.broken_image)),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: const EasySmartBannerAd(
+              priorityAdNetworks: [
+                AdNetwork.facebook,
+                AdNetwork.admob,
+                AdNetwork.unity,
+                AdNetwork.appLovin,
+              ],
+              adSize: AdSize.banner,
+            ),
+          ),
+        ]));
   }
 }
