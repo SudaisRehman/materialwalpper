@@ -1,5 +1,8 @@
+import 'package:ad_gridview/ad_gridview.dart';
+import 'package:admob_easy/ads/services/admob_easy_native.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:materialwalpper/Provider/AppProvider.dart';
 import 'package:materialwalpper/Provider/FavoriteProvider.dart';
 import 'package:materialwalpper/Screens/WallpaperScreen/WallpaperDetailsScreen.dart';
 // import 'package:materialwalpper/wallpaper_detail.dart';
@@ -11,6 +14,7 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favoriteProvider = Provider.of<FavoriteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     final favorites = favoriteProvider.favorites;
 
     return Scaffold(
@@ -48,17 +52,42 @@ class FavoritesScreen extends StatelessWidget {
                 ],
               ),
             )
-          : GridView.builder(
+          : AdGridView(
               padding: const EdgeInsets.all(8.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of columns
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                childAspectRatio:
-                    0.7, // Adjust to fit the wallpaper aspect ratio
+              // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount:
+                  appProvider.displayWallpaperColumns, // Number of columns
+              //   crossAxisSpacing: 8.0,
+              //   mainAxisSpacing: 8.0,
+              //   childAspectRatio:
+              //       0.7, // Adjust to fit the wallpaper aspect ratio
+              // ),
+              controller: ScrollController(),
+              adWidget: Column(
+                children: [
+                  AdmobEasyNative.mediumTemplate(
+                    minWidth: 320,
+                    minHeight: 320,
+                    maxWidth: 360,
+                    maxHeight: 360,
+                    onAdOpened: (ad) => print("Ad Opened"),
+                    onAdClosed: (ad) => print("Ad Closed"),
+                    onPaidEvent: (ad, value, precision, currencyCode) {
+                      print(
+                          "Paid event: $value $currencyCode with precision: $precision");
+                    },
+                  ),
+                  // SizedBox(height: 10),
+                ],
               ),
+
+              adGridViewType: AdGridViewType.custom,
+              // itemCount: _wallpapers.length, // Total number of wallpapers
+              adIndex: 3,
+              itemMainAspectRatio: 1.5,
+              customAdIndex: [3, 15, 30, 45, 60, 75, 90, 105],
               itemCount: favorites.length,
-              itemBuilder: (context, index) {
+              itemWidget: (context, index) {
                 final wallpaper = favorites[index];
                 final imageUrl =
                     'https://gaming.sunztech.com/upload/${wallpaper['image_upload']}';
@@ -79,7 +108,7 @@ class FavoritesScreen extends StatelessWidget {
                       return;
                     }
                     print('favorites: $favorites');
-                    print('index: $index');
+                    print('indexnn: $index');
                     // Optional: Navigate to a detailed wallpaper view if needed
                     Navigator.push(
                         context,
@@ -89,56 +118,60 @@ class FavoritesScreen extends StatelessWidget {
                                   initialIndex: index,
                                 )));
                   },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Image.network(
-                        //   imageUrl,
-                        //   fit: BoxFit.cover,
-                        //   errorBuilder: (context, error, stackTrace) =>
-                        //       const Center(
-                        //     child: Icon(
-                        //       Icons.broken_image,
-                        //       size: 50,
-                        //       color: Colors.grey,
-                        //     ),
-                        //   ),
-                        // ),
-                        CachedNetworkImage(
-                          imageUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) => const Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 50,
-                              color: Colors.grey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Image.network(
+                          //   imageUrl,
+                          //   fit: BoxFit.cover,
+                          //   errorBuilder: (context, error, stackTrace) =>
+                          //       const Center(
+                          //     child: Icon(
+                          //       Icons.broken_image,
+                          //       size: 50,
+                          //       color: Colors.grey,
+                          //     ),
+                          //   ),
+                          // ),
+                          CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 8.0,
-                          right: 8.0,
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.favorite,
-                              color: Colors.red,
+                          Positioned(
+                            top: 8.0,
+                            right: 8.0,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.favorite,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                favoriteProvider
+                                    .removeFavorite(wallpaper['id']);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Removed from favorites'),
+                                  ),
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              favoriteProvider.removeFavorite(wallpaper['id']);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Removed from favorites'),
-                                ),
-                              );
-                            },
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

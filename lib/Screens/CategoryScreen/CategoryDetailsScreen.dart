@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:ad_gridview/ad_gridview.dart';
+import 'package:admob_easy/ads/services/admob_easy_native.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -109,7 +111,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
         orderBy = "ORDER BY g.featured DESC";
         break;
       case 2:
-        orderBy = "ORDER BY g.popular DESC";
+        orderBy = "ORDER BY g.view_count DESC";
         break;
       case 3:
         orderBy = "ORDER BY RAND()";
@@ -281,17 +283,17 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                                 });
                               },
                             ),
-                            RadioListTile<int>(
-                              value: 4,
-                              groupValue: _selectedSortOption,
-                              activeColor: Colors.green,
-                              title: Text('Live Wallpaper'),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSortOption = value!;
-                                });
-                              },
-                            ),
+                            // RadioListTile<int>(
+                            //   value: 4,
+                            //   groupValue: _selectedSortOption,
+                            //   activeColor: Colors.green,
+                            //   title: Text('Live Wallpaper'),
+                            //   onChanged: (value) {
+                            //     setState(() {
+                            //       _selectedSortOption = value!;
+                            //     });
+                            //   },
+                            // ),
                           ],
                         ),
                         actions: [
@@ -342,9 +344,12 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
           ? GridView.builder(
               padding: EdgeInsets.all(10),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                crossAxisCount: appProvider.displayWallpaperColumns,
+                // crossAxisSpacing: 10,
+                // mainAxisSpacing: 10,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 8,
+                childAspectRatio: 0.65,
               ),
               itemCount: 22, // Number of shimmer items
               itemBuilder: (context, index) {
@@ -366,47 +371,77 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
             )
           : _wallpapers.isEmpty
               ? Center(child: Text('No wallpapers found'))
-              : GridView.builder(
-                  padding: EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+              : AdGridView(
+                  padding: EdgeInsets.all(5),
+                  // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  //   crossAxisCount: 3,
+                  //   crossAxisSpacing: 10,
+                  //   mainAxisSpacing: 10,
+                  // ),
+                  controller: ScrollController(),
+
+                  crossAxisCount: appProvider.displayWallpaperColumns,
+                  adGridViewType: AdGridViewType.custom,
+                  itemCount: _wallpapers.length, // Total number of wallpapers
+                  adIndex: 3,
+                  // itemMainAspectRatio: 1,
+                  itemMainAspectRatio: 1.5,
+                  customAdIndex: [3, 15, 30, 45, 60, 75, 90, 105],
+                  adWidget: Column(
+                    children: [
+                      AdmobEasyNative.mediumTemplate(
+                        minWidth: 320,
+                        minHeight: 320,
+                        maxWidth: 360,
+                        maxHeight: 360,
+                        onAdOpened: (ad) => print("Ad Opened"),
+                        onAdClosed: (ad) => print("Ad Closed"),
+                        onPaidEvent: (ad, value, precision, currencyCode) {
+                          print(
+                              "Paid event: $value $currencyCode with precision: $precision");
+                        },
+                      ),
+                      // SizedBox(height: 10),
+                    ],
                   ),
-                  itemCount: _wallpapers.length,
-                  itemBuilder: (context, index) {
+                  // itemCount: _wallpapers.length,
+                  itemWidget: (context, index) {
                     final wallpaper = _wallpapers[index];
                     final imageUrl = getImageUrl(wallpaper['image_upload']);
 
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: GestureDetector(
-                        onTap: () {
-                          _handleTap();
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => WallpaperDetailsScreen(
-                          //               wallpapers: _wallpapers,
-                          //               initialIndex: index,
-                          //             )));
-                        },
-                        child: CachedNetworkImage(
-                          imageUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: appProvider.isDarkTheme
-                                ? Colors.grey[800]!
-                                : Colors.grey[300]!,
-                            highlightColor: appProvider.isDarkTheme
-                                ? Colors.grey[700]!
-                                : Colors.grey[200]!,
-                            child: Container(
-                              color: Colors.white,
+                    return Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: GestureDetector(
+                          onTap: () {
+                            _handleTap();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        WallpaperDetailsScreen(
+                                          wallpapers: _wallpapers,
+                                          initialIndex: index,
+                                        )));
+                          },
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: appProvider.isDarkTheme
+                                  ? Colors.grey[800]!
+                                  : Colors.grey[300]!,
+                              highlightColor: appProvider.isDarkTheme
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[200]!,
+                              child: Container(
+                                color: Colors.white,
+                              ),
                             ),
+                            errorWidget: (context, url, error) =>
+                                Center(child: Icon(Icons.broken_image)),
                           ),
-                          errorWidget: (context, url, error) =>
-                              Center(child: Icon(Icons.broken_image)),
                         ),
                       ),
                     );

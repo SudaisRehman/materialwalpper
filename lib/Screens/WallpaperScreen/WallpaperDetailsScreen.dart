@@ -772,6 +772,7 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                           if (favoriteProvider.isFavorite(imageId)) {
                             // Remove from favorites
                             favoriteProvider.removeFavorite(imageId);
+                            Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content:
@@ -787,6 +788,7 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                   wallpaper['image_name'] ?? 'Unknown',
                               'category_name':
                                   wallpaper['category_name'] ?? 'Unknown',
+                              'index': _currentIndex, // Add the current index
                             });
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -815,12 +817,18 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                               : Colors.black,
                         ),
                         onPressed: () {
+                          print('Wallpaper: ${widget.wallpapers}');
+                          print('Wallpapers List: ${widget.wallpapers}');
+                          print('Current Index: $_currentIndex');
+
                           showModalBottomSheet(
                             backgroundColor: appProvider.isDarkTheme
                                 ? Colors.black
                                 : Colors.white,
                             context: context,
                             builder: (BuildContext context) {
+                              // final wallpaper =
+                              //     widget.wallpapers[_currentIndex];
                               final wallpaper =
                                   widget.wallpapers[_currentIndex];
                               return Container(
@@ -950,7 +958,8 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                             : Colors.black,
                                                   )),
                                               SizedBox(height: 5),
-                                              Text('${wallpaper['resolution']}',
+                                              Text(
+                                                  '${wallpaper['resolution'] ?? '720 x 1280'}',
                                                   style: TextStyle(
                                                     color:
                                                         appProvider.isDarkTheme
@@ -958,7 +967,8 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                             : Colors.black,
                                                   )),
                                               SizedBox(height: 5),
-                                              Text('${wallpaper['size']}',
+                                              Text(
+                                                  '${wallpaper['size'] ?? '114.94 KB'}',
                                                   style: TextStyle(
                                                     color:
                                                         appProvider.isDarkTheme
@@ -966,7 +976,8 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                             : Colors.black,
                                                   )),
                                               SizedBox(height: 5),
-                                              Text('${wallpaper['views']}',
+                                              Text(
+                                                  '${wallpaper['views'] ?? '0'}',
                                                   style: TextStyle(
                                                     color:
                                                         appProvider.isDarkTheme
@@ -974,7 +985,8 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                             : Colors.black,
                                                   )),
                                               SizedBox(height: 5),
-                                              Text('${wallpaper['downloads']}',
+                                              Text(
+                                                  '${wallpaper['downloads'] ?? '0'}',
                                                   style: TextStyle(
                                                     color:
                                                         appProvider.isDarkTheme
@@ -992,7 +1004,7 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                   )),
                                               SizedBox(height: 5),
                                               Text(
-                                                  '${wallpaper['last_update']}',
+                                                  '${wallpaper['last_update'] ?? '2025-01-08 11:14:21'}',
                                                   style: TextStyle(
                                                     color:
                                                         appProvider.isDarkTheme
@@ -1018,14 +1030,14 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                   borderRadius:
                                                       BorderRadius.circular(15),
                                                 ),
-                                                child:
-                                                    Text('${wallpaper['tags']}',
-                                                        style: TextStyle(
-                                                          color: appProvider
-                                                                  .isDarkTheme
-                                                              ? Colors.white
-                                                              : Colors.black,
-                                                        )),
+                                                child: Text(
+                                                    '${wallpaper['tags'] ?? '${wallpaper['category_name']}'}',
+                                                    style: TextStyle(
+                                                      color: appProvider
+                                                              .isDarkTheme
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    )),
                                               ),
                                             ],
                                           ),
