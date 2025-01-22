@@ -59,6 +59,8 @@ dependencies:
   admob_easy: ^1.1.8
   ad_gridview: ^0.0.5
   crop_your_image: ^2.0.0
+  flutter_html: ^3.0.0-beta.2
+  url_launcher: ^6.3.1
   # image_cropper: ^8.1.0
   # flutter_wallpaper_manager: ^0.0.4
 

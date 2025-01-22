@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,6 +67,35 @@ class AppProvider extends ChangeNotifier {
 
   void incrementTapCount() {
     _tapCount++;
+    notifyListeners();
+  }
+
+  Future<int> getSharedPreferencesSize() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int totalSize = 0;
+
+      for (String key in prefs.getKeys()) {
+        final value = prefs.get(key);
+        final jsonValue = jsonEncode(value); // Convert the value to JSON
+        totalSize +=
+            utf8.encode(jsonValue).length; // Calculate the size in bytes
+      }
+
+      return totalSize;
+    } catch (e) {
+      print('Error calculating SharedPreferences size: $e');
+      return 0;
+    }
+  }
+
+  Future<void> clearSharedPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } catch (e) {
+      print('Error clearing SharedPreferences: $e');
+    }
     notifyListeners();
   }
 }

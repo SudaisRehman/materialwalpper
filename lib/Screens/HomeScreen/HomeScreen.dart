@@ -144,129 +144,209 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final appProvider = Provider.of<AppProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: appProvider.isDarkTheme
-            ? Colors.green[00]
-            : Colors.green[100], // Dark mode background for AppBar
-        title: GestureDetector(
-          onTap: () {
-            _onSearch();
-          },
-          child: Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: appProvider.isDarkTheme
-                  ? Colors.grey[800]
-                  : Colors.white, // Dark mode for text field background
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Stack(
-              children: [
-                TextField(
-                  controller:
-                      _searchController, // Use the controller for search input
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    hintStyle: TextStyle(
-                      color: appProvider.isDarkTheme
-                          ? Colors.white70
-                          : Colors.black, // Hint text color
-                    ),
-                    prefixIcon: GestureDetector(
-                        onTap: () {
-                          _onSearch();
-                        },
-                        child: Icon(Icons.arrow_back,
-                            color: appProvider.isDarkTheme
-                                ? Colors.white
-                                : Colors.black)),
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.search,
-                          color: appProvider.isDarkTheme
-                              ? Colors.white
-                              : Colors.black),
-                      onPressed:
-                          _onSearch, // Call search function when button is pressed
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  style: TextStyle(
-                    color: appProvider.isDarkTheme
-                        ? Colors.white
-                        : Colors.black, // Text color inside TextField
-                  ),
+  void _onPop() {
+    _showThankYouScreen(context).then((shouldCloseApp) {
+      if (shouldCloseApp) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  Future<bool> _showThankYouScreen(BuildContext context) async {
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+    Size size = MediaQuery.of(context).size;
+
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text(
+                'Exit App',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: appProvider.isDarkTheme ? Colors.white : Colors.black,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    _onSearch();
-                  },
-                  child: Container(
-                    height: 50,
-                    color: Colors.transparent,
-                    width: double.infinity,
-                  ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Do you really want to exit?',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: appProvider.isDarkTheme ? Colors.white : Colors.black,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.image,
-                color: appProvider.isDarkTheme ? Colors.white : Colors.green),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsScreen(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
                 ),
-              );
-              // Add functionality for an image button if needed
-            },
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text(
+                  'No',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text(
+                  'Yes',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(child: _pages[_selectedIndex]),
-          const EasySmartBannerAd(
-            priorityAdNetworks: [
-              AdNetwork.facebook,
-              AdNetwork.admob,
-              AdNetwork.unity,
-              AdNetwork.appLovin,
-            ],
-            adSize: AdSize.banner,
-          ),
-        ],
-      ), // Display the selected tab
+    ).then((value) => value ?? false);
+  }
 
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedLabelStyle: TextStyle(color: Colors.black, fontSize: 14),
-        selectedLabelStyle: TextStyle(color: Colors.green, fontSize: 14),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.image),
-            label: 'Wallpaper',
+  @override
+  Widget build(BuildContext context) {
+    final appProvider = Provider.of<AppProvider>(context);
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldCloseApp = await _showThankYouScreen(context);
+        return shouldCloseApp;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: appProvider.isDarkTheme
+              ? Colors.green[00]
+              : Colors.green[100], // Dark mode background for AppBar
+          title: GestureDetector(
+            onTap: () {
+              _onSearch();
+            },
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: appProvider.isDarkTheme
+                    ? Colors.grey[800]
+                    : Colors.white, // Dark mode for text field background
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Stack(
+                children: [
+                  TextField(
+                    controller:
+                        _searchController, // Use the controller for search input
+                    decoration: InputDecoration(
+                      hintText: 'Search',
+                      hintStyle: TextStyle(
+                        color: appProvider.isDarkTheme
+                            ? Colors.white70
+                            : Colors.black, // Hint text color
+                      ),
+                      prefixIcon: GestureDetector(
+                          onTap: () {
+                            _onSearch();
+                          },
+                          child: Icon(Icons.arrow_back,
+                              color: appProvider.isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black)),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.search,
+                            color: appProvider.isDarkTheme
+                                ? Colors.white
+                                : Colors.black),
+                        onPressed:
+                            _onSearch, // Call search function when button is pressed
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    style: TextStyle(
+                      color: appProvider.isDarkTheme
+                          ? Colors.white
+                          : Colors.black, // Text color inside TextField
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _onSearch();
+                    },
+                    child: Container(
+                      height: 50,
+                      color: Colors.transparent,
+                      width: double.infinity,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Category',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            label: 'Favorite',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
-        onTap: _onItemTapped,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.image,
+                  color: appProvider.isDarkTheme ? Colors.white : Colors.green),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(),
+                  ),
+                );
+                // Add functionality for an image button if needed
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(child: _pages[_selectedIndex]),
+            const EasySmartBannerAd(
+              priorityAdNetworks: [
+                AdNetwork.facebook,
+                AdNetwork.admob,
+                AdNetwork.unity,
+                AdNetwork.appLovin,
+              ],
+              adSize: AdSize.banner,
+            ),
+          ],
+        ), // Display the selected tab
+
+        bottomNavigationBar: BottomNavigationBar(
+          unselectedLabelStyle: TextStyle(color: Colors.black, fontSize: 14),
+          selectedLabelStyle: TextStyle(color: Colors.green, fontSize: 14),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.image),
+              label: 'Wallpaper',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: 'Category',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_outline),
+              label: 'Favorite',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.green,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:materialwalpper/Provider/AppProvider.dart';
 import 'package:materialwalpper/Provider/FavoriteProvider.dart';
 import 'package:materialwalpper/Screens/WallpaperScreen/CropImageScreen.dart';
+import 'package:materialwalpper/Screens/WallpaperScreen/DownloadScreen.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui'; // For the BackdropFilter widget
 import 'package:share_plus/share_plus.dart';
@@ -162,10 +163,13 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
         quality: 60,
         name: "wallpaper_${DateTime.now().millisecondsSinceEpoch}",
       );
+
       if (result['isSuccess']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image saved to gallery!')),
-        );
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Downloadscreen()));
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Image saved to gallery!')),
+        // );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save image.')),
@@ -585,7 +589,7 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                 : Colors.black,
                                           )),
                                       onTap: () async {
-                                        Navigator.push(
+                                        Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
@@ -608,10 +612,123 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                                 : Colors.black,
                                           )),
                                       onTap: () async {
+                                        // _showRewardedAd();
                                         //Save image to device
                                         // save to App Directory
-                                        _downloadImage();
-                                        Navigator.pop(context);
+                                        // _downloadImage();
+                                        int _timerSeconds =
+                                            5; // Countdown timer
+                                        Timer? timer; // Timer reference
+
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (BuildContext dialogContext) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                // Start the timer when the dialog is shown
+                                                timer ??= Timer.periodic(
+                                                  const Duration(seconds: 1),
+                                                  (timer) {
+                                                    if (_timerSeconds > 1) {
+                                                      setState(() {
+                                                        _timerSeconds--;
+                                                      });
+                                                    } else {
+                                                      timer
+                                                          .cancel(); // Stop the timer
+                                                      // timer =
+                                                      //     null; // Reset the timer reference
+                                                      if (Navigator.canPop(
+                                                          dialogContext)) {
+                                                        Navigator.of(
+                                                                dialogContext)
+                                                            .pop(); // Close the dialog
+                                                      }
+                                                      _showAd(); // Show the ad after dialog is closed
+                                                    }
+                                                  },
+                                                );
+
+                                                return AlertDialog(
+                                                  title: Text(
+                                                    'Download Free Wallpaper',
+                                                    style: TextStyle(
+                                                      fontSize: 19,
+                                                      color: appProvider
+                                                              .isDarkTheme
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                  content: Text(
+                                                    'Wallpaper will be downloaded after the short ad.',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: appProvider
+                                                              .isDarkTheme
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      child: Text(
+                                                        'No Thanks',
+                                                        style: TextStyle(
+                                                            color: Colors.blue,
+                                                            fontSize: 12),
+                                                      ),
+                                                      onPressed: () {
+                                                        if (timer != null &&
+                                                            timer!.isActive) {
+                                                          timer!
+                                                              .cancel(); // Cancel the timer if active
+                                                          timer =
+                                                              null; // Reset the timer reference
+                                                        }
+                                                        Navigator.of(
+                                                                dialogContext)
+                                                            .pop(); // Close the dialog
+                                                      },
+                                                    ),
+                                                    SizedBox(width: 30),
+                                                    TextButton(
+                                                      child: Text(
+                                                        'Ad Starts in $_timerSeconds',
+                                                        style: TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 12),
+                                                      ),
+                                                      onPressed: () {
+                                                        if (timer != null &&
+                                                            timer!.isActive) {
+                                                          timer!
+                                                              .cancel(); // Cancel the timer
+                                                          timer =
+                                                              null; // Reset the timer reference
+                                                        }
+                                                        Navigator.of(
+                                                                dialogContext)
+                                                            .pop(); // Close the dialog
+                                                        _showAd(); // Show the ad
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ).then((_) {
+                                          // Ensure timer cleanup when dialog is dismissed
+                                          if (timer != null &&
+                                              timer!.isActive) {
+                                            timer!.cancel();
+                                            timer = null;
+                                          }
+                                        });
+
+                                        // Navigator.pop(context);
                                       },
                                     ),
 
