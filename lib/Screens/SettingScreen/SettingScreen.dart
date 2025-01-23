@@ -171,25 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   .showSnackBar(const SnackBar(content: Text('Cache cleared')));
             },
           ),
-          // const Divider(),
 
-          // // Clear Search History
-          // ListTile(
-          //   title: Text(
-          //     'Clear Search History',
-          //     style: TextStyle(
-          //         fontSize: 16,
-          //         color:
-          //             isDarkTheme ? Colors.white : Colors.black, // Text color
-          //         fontWeight: FontWeight.w500),
-          //   ),
-          //   subtitle: const Text('Remove searches you have performed'),
-          //   onTap: () {
-          //     appProvider.clearSearchHistory();
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //         const SnackBar(content: Text('Search history cleared')));
-          //   },
-          // ),
           const Divider(),
 
           // Wallpaper Save Location

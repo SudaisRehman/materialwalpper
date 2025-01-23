@@ -167,51 +167,6 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
     }
   }
 
-  // Future<void> _fetchCategoryDetails() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   List<dynamic> wallpapers = [];
-  //   int page = 1;
-  //   bool hasMore = true;
-
-  //   try {
-  //     while (hasMore) {
-  //       final response = await http.get(
-  //         Uri.parse(
-  //             '$apiUrl?get_category_details&page=$page&count=20&id=${widget.categoryId}&filter=g.image_extension != \"all\"&order=ORDER BY g.id DESC'),
-  //         headers: headers,
-  //       );
-
-  //       if (response.statusCode == 200) {
-  //         final data = json.decode(response.body);
-  //         if (data['status'] == 'ok') {
-  //           wallpapers.addAll(data['posts']);
-
-  //           // Check if more pages exist
-  //           if (data['posts'].length < 20) {
-  //             hasMore = false;
-  //           } else {
-  //             page++;
-  //           }
-  //         } else {
-  //           hasMore = false;
-  //         }
-  //       } else {
-  //         throw Exception('Failed to load category details');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching category details: $e');
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //       _wallpapers = wallpapers;
-  //     });
-  //   }
-  // }
-
   String getImageUrl(String imageUpload) {
     return 'https://gaming.sunztech.com/upload/$imageUpload';
   }
@@ -291,17 +246,6 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                                   });
                                 },
                               ),
-                              // RadioListTile<int>(
-                              //   value: 4,
-                              //   groupValue: _selectedSortOption,
-                              //   activeColor: Colors.green,
-                              //   title: Text('Live Wallpaper'),
-                              //   onChanged: (value) {
-                              //     setState(() {
-                              //       _selectedSortOption = value!;
-                              //     });
-                              //   },
-                              // ),
                             ],
                           ),
                           actions: [

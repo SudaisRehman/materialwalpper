@@ -131,19 +131,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
     }
   }
 
-  // void _startTimer() {
-  //   _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-  //     if (_timerSeconds > 1) {
-  //       setState(() {
-  //         _timerSeconds--;
-  //       });
-  //     } else {
-  //       timer.cancel();
-  //       _showAd();
-  //     }
-  //   });
-  // }
-
   void _showAd() {
     if (_isAdLoaded) {
       _showRewardedAd();
@@ -372,30 +359,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                             builder: (BuildContext context) {
                               return StatefulBuilder(
                                 builder: (context, setState) {
-                                  // Start the timer when the dialog is shown
-                                  // Timer.periodic(const Duration(seconds: 1),
-                                  //     (timer) {
-                                  //   if (_timerSeconds > 1) {
-                                  //     setState(() {
-                                  //       _timerSeconds--;
-                                  //     });
-                                  //   } else {
-                                  //     timer.cancel();
-                                  //     // Navigator.pop(context);
-                                  //     Navigator.of(context)
-                                  //         .pop(); // Close the dialog
-                                  //     // _showAd(); // Show the interstitial ad
-                                  //   }
-                                  // });
-
-                                  // Future.delayed(
-                                  //     Duration(seconds: _timerSeconds), () {
-                                  //   if (mounted) {
-                                  //     Navigator.of(context)
-                                  //         .pop(); // Close the dialog
-                                  //   }
-                                  // });
-
                                   timer ??= Timer.periodic(
                                       const Duration(seconds: 1), (timer) {
                                     if (_timerSeconds > 1) {
@@ -452,41 +415,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                           _showAd();
-                                          //   final response = await http
-                                          //       .get(Uri.parse(backgroundImageUrl));
-                                          //   if (response.statusCode == 200) {
-
-                                          //     final result =
-                                          //         await ImageGallerySaver.saveImage(
-                                          //       Uint8List.fromList(
-                                          //           response.bodyBytes),
-                                          //       quality: 60,
-                                          //       name:
-                                          //           "wallpaper_${DateTime.now().millisecondsSinceEpoch}",
-                                          //     );
-                                          //     if (result['isSuccess']) {
-                                          //       ScaffoldMessenger.of(context)
-                                          //           .showSnackBar(
-                                          //         SnackBar(
-                                          //             content: Text(
-                                          //                 'Image saved to gallery!')),
-                                          //       );
-                                          //     } else {
-                                          //       ScaffoldMessenger.of(context)
-                                          //           .showSnackBar(
-                                          //         SnackBar(
-                                          //             content: Text(
-                                          //                 'Failed to save image.')),
-                                          //       );
-                                          //     }
-                                          //   } else {
-                                          //     ScaffoldMessenger.of(context)
-                                          //         .showSnackBar(
-                                          //       SnackBar(
-                                          //           content: Text(
-                                          //               'Failed to download image.')),
-                                          //     );
-                                          //   }
                                         },
                                       ),
                                     ],
@@ -731,20 +659,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                                         // Navigator.pop(context);
                                       },
                                     ),
-
-                                    // ListTile(
-                                    //   leading: Icon(Icons.saveto_device,
-                                    //       color: appProvider.isDarkTheme
-                                    //           ? Colors.white
-                                    //           : Colors.black),
-                                    //   title: Text('Save to Device',
-                                    //       style: TextStyle(
-                                    //         color: appProvider.isDarkTheme
-                                    //             ? Colors.white
-                                    //             : Colors.black,
-                                    //       )),
-                                    //   onTap: () async {},
-                                    // ),
                                   ],
                                 ),
                               );
@@ -753,84 +667,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                         },
                       ),
                     ),
-                    // Container(
-                    //   width: 40,
-                    //   height: 40,
-                    //   decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.circular(10),
-                    //     color: appProvider.isDarkTheme
-                    //         ? Colors.grey[800]
-                    //         : Colors.white,
-                    //   ),
-                    //   child: IconButton(
-                    //     icon: Builder(builder: (context) {
-                    //       log('Favorite Icon: ${widget.wallpapers[_currentIndex]}');
-
-                    //       return Icon(
-                    //         favoriteProvider.isFavorite(
-                    //                 widget.wallpapers[_currentIndex]
-                    //                         ['image_id'] ??
-                    //                     '')
-                    //             ? Icons.favorite
-                    //             : Icons.favorite_border,
-                    //         color: favoriteProvider.isFavorite(
-                    //                 widget.wallpapers[_currentIndex]
-                    //                         ['image_id'] ??
-                    //                     '')
-                    //             ? Colors.red
-                    //             : appProvider.isDarkTheme
-                    //                 ? Colors.white
-                    //                 : Colors.black,
-                    //       );
-                    //     }),
-                    //     onPressed: () {
-                    //       final wallpaper = widget.wallpapers[_currentIndex];
-
-                    //       // Validate if the required fields are present
-                    //       if (wallpaper['image_id'] == null ||
-                    //           wallpaper['image_upload'] == null) {
-                    //         ScaffoldMessenger.of(context).showSnackBar(
-                    //           SnackBar(
-                    //             content: Text(
-                    //               'Invalid wallpaper data. Cannot update favorites.',
-                    //             ),
-                    //           ),
-                    //         );
-                    //         return;
-                    //       }
-
-                    //       // Check if the wallpaper is already in favorites
-                    //       if (favoriteProvider
-                    //           .isFavorite(wallpaper['image_id'])) {
-                    //         // Remove from favorites
-                    //         favoriteProvider
-                    //             .removeFavorite(wallpaper['image_id']);
-                    //         ScaffoldMessenger.of(context).showSnackBar(
-                    //           SnackBar(
-                    //             content:
-                    //                 Text('Wallpaper removed from favorites!'),
-                    //           ),
-                    //         );
-                    //       } else {
-                    //         // Add to favorites
-                    //         favoriteProvider.addFavorite({
-                    //           'id': wallpaper['image_id'] ??
-                    //               '', // Use image_id as the id
-                    //           'image_upload': wallpaper['image_upload'] ?? '',
-                    //           'image_name':
-                    //               wallpaper['image_name'] ?? 'Unknown',
-                    //           'category_name':
-                    //               wallpaper['category_name'] ?? 'Unknown',
-                    //         });
-                    //         ScaffoldMessenger.of(context).showSnackBar(
-                    //           SnackBar(
-                    //             content: Text('Wallpaper added to favorites!'),
-                    //           ),
-                    //         );
-                    //       }
-                    //     },
-                    //   ),
-                    // ),
                     Container(
                       width: 40,
                       height: 40,
@@ -916,7 +752,6 @@ class _WallpaperDetailsScreenState extends State<WallpaperDetailsScreen> {
                         },
                       ),
                     ),
-
                     Container(
                       width: 40,
                       height: 40,

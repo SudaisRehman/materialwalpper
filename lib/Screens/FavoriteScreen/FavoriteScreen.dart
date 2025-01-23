@@ -136,11 +136,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   appProvider.displayWallpaperColumns, // Number of columns
-              //   crossAxisSpacing: 8.0,
-              //   mainAxisSpacing: 8.0,
-              //   childAspectRatio:
-              //       0.7, // Adjust to fit the wallpaper aspect ratio
-              // ),
+
               controller: ScrollController(),
               adWidget: Column(
                 children: [
@@ -205,18 +201,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // Image.network(
-                          //   imageUrl,
-                          //   fit: BoxFit.cover,
-                          //   errorBuilder: (context, error, stackTrace) =>
-                          //       const Center(
-                          //     child: Icon(
-                          //       Icons.broken_image,
-                          //       size: 50,
-                          //       color: Colors.grey,
-                          //     ),
-                          //   ),
-                          // ),
                           CachedNetworkImage(
                             imageUrl: imageUrl,
                             fit: BoxFit.cover,

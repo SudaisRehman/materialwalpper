@@ -63,9 +63,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Set full-screen immersive mode
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(

@@ -77,16 +77,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Categories"),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
-        //     onPressed: () {
-        //       setState(() {
-        //         _isGridView = !_isGridView;
-        //       });
-        //     },
-        //   ),
-        // ],
       ),
       body: _isLoading
           ? appProvider.displayCategory == 'Grid'

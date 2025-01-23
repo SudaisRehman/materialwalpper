@@ -157,16 +157,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           await WallpaperManager.setWallpaperFromFile(file.path, location);
 
       if (result) {
-      } else {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Failed to set wallpaper.')),
-        // );
-      }
-    } on PlatformException {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Error setting wallpaper.')),
-      // );
-    }
+      } else {}
+    } on PlatformException {}
   }
 
   // Helper function to save image bytes to a temporary file
@@ -199,13 +191,6 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
           print('User earned reward: ${reward.amount} ${reward.type}');
           _downloadImage(context); // Proceed with the download after the ad
-
-          // Future.delayed(const Duration(seconds: 1), () {
-          //   Navigator.pushReplacement(
-          //     context,
-          //     MaterialPageRoute(builder: (context) => Downloadscreen()),
-          //   );
-          // });
         },
       );
       _rewardedAd = null; // Dispose of the rewarded ad
