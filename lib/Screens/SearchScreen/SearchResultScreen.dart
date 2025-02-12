@@ -360,13 +360,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 // SizedBox(height: 10),
               ],
             ),
-            // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //   crossAxisCount: appProvider.displayWallpaperColumns,
-            //   crossAxisSpacing: 6,
-            //   mainAxisSpacing: 6,
-            //   childAspectRatio: 0.6,
-            // ),
-            // itemCount: _wallpapers.length,
+       
             itemWidget: (context, index) {
               final wallpaper = _wallpapers[index];
               final imageUrl = getImageUrl(wallpaper['image_upload']);

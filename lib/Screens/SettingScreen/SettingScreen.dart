@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:materialwalpper/Provider/AppProvider.dart';
+import 'package:materialwalpper/Screens/SettingScreen/PrivacyPolicyScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_html/flutter_html.dart';
@@ -225,50 +226,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             subtitle: const Text('App Terms & Policies'),
             onTap: () {
-              //  final appProvider = Provider.of<AppProvider>(context, listen: false);
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(
-                      'Privacy Policy',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: appProvider.isDarkTheme
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    ),
-                    content: _isLoading
-                        ? const CircularProgressIndicator()
-                        : SingleChildScrollView(
-                            child: Html(
-                              data: _privacyPolicy, // Render HTML content
-                              style: {
-                                "body": Style(
-                                  fontSize: FontSize(14.0),
-                                  color: Colors.black87,
-                                ),
-                              },
-                            ),
-                          ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text(
-                          'Close',
-                          style: TextStyle(
-                            color: Colors.green,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PrivacyPolicyScreen(),
+                ),
               );
+              //  final appProvider = Provider.of<AppProvider>(context, listen: false);
+              // showDialog(
+              //   context: context,
+              //   builder: (BuildContext context) {
+              //     return AlertDialog(
+              //       title: Text(
+              //         'Privacy Policy',
+              //         style: TextStyle(
+              //           fontSize: 18,
+              //           fontWeight: FontWeight.bold,
+              //           color: appProvider.isDarkTheme
+              //               ? Colors.white
+              //               : Colors.black,
+              //         ),
+              //       ),
+              //       content: _isLoading
+              //           ? const CircularProgressIndicator()
+              //           : SingleChildScrollView(
+              //               child: Html(
+              //                 data: _privacyPolicy, // Render HTML content
+              //                 style: {
+              //                   "body": Style(
+              //                     fontSize: FontSize(14.0),
+              //                     color: Colors.black87,
+              //                   ),
+              //                 },
+              //               ),
+              //             ),
+              //       actions: <Widget>[
+              //         TextButton(
+              //           child: const Text(
+              //             'Close',
+              //             style: TextStyle(
+              //               color: Colors.green,
+              //             ),
+              //           ),
+              //           onPressed: () {
+              //             Navigator.of(context).pop();
+              //           },
+              //         ),
+              //       ],
+              //     );
+              // },
+              // );
+
               // Add navigation to privacy policy
             },
           ),
